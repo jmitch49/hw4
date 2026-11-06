@@ -169,7 +169,11 @@ def lookup(target_name: dns.name.Name,
             # Debugging: Count the number of queries made
             global QUERY_COUNT
             QUERY_COUNT += 1
-            print("DNS query:", server)
+            # print("DNS query:", server)
+
+            # print("DNS query:", server,
+            #         "| Name:", target_name,
+            #         "| Type:", dns.rdatatype.to_text(qtype))
             try:
                 response = dns.query.udp(
                     query,
@@ -287,7 +291,21 @@ def main():
                                  action="store_true")
     program_args = argument_parser.parse_args()
     for a_domain_name in program_args.name:
-        print_results(collect_results(a_domain_name))
+        # print_results(collect_results(a_domain_name))
+
+        if not a_domain_name.strip():
+            print("Error: Domain name cannot be empty.")
+            continue
+
+        try:
+            results = collect_results(a_domain_name)
+            if not any(results.values()):
+                print(f"Unable to resolve {a_domain_name}.")
+            else:
+                print_results(results)
+
+        except Exception:
+            print(f"Unable to resolve {a_domain_name}.")
     # Debugging: Print the total number of queries made
     # print("Total DNS queries:", QUERY_COUNT)
 
